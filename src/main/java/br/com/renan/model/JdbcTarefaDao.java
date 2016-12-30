@@ -29,8 +29,7 @@ public class JdbcTarefaDao {
 
 	public void adiciona(Tarefa tarefa) throws SQLException {
 		SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
-		PreparedStatement ps = connection
-				.prepareStatement("insert into tarefa(descricao,finalizado) values (?,?)");
+		PreparedStatement ps = connection.prepareStatement("insert into tarefa(descricao,finalizado) values (?,?)");
 		ps.setString(1, tarefa.getDescricao());
 		ps.setBoolean(2, tarefa.isFinalizado());
 		ps.execute();
@@ -62,6 +61,55 @@ public class JdbcTarefaDao {
 			tarefa.setDataFinalizacao(dataFinalizacao);
 		}
 		return tarefa;
+	}
+
+	public void remove(Tarefa tarefa) throws SQLException {
+		if (tarefa.getId() == null) {
+			throw new IllegalStateException("id esta vazio");
+		}
+		PreparedStatement ps = connection.prepareStatement("delete from tarefa where id = ?");
+		ps.setLong(1, tarefa.getId());
+		ps.execute();
+		ps.close();
+	}
+
+	public Tarefa buscaPorId(Long id) throws SQLException {
+
+		if (id == null) {
+			throw new IllegalStateException("id invalido");
+		}
+		PreparedStatement ps = connection.prepareStatement("select * from tarefa where id = ?");
+		ps.setLong(1, id);
+		ResultSet rs = ps.executeQuery();
+		if (rs.next()) {
+			return popularTarefa(rs);
+		}
+		rs.close();
+		ps.close();
+		return null;
+	}
+
+	public void altera(Tarefa tarefa) throws SQLException {
+		PreparedStatement ps = connection
+				.prepareStatement("update tarefa set descricao = ?, finalizado = ?, datafinalizacao = ? where id = ?");
+		ps.setString(1, tarefa.getDescricao());
+		ps.setBoolean(2, tarefa.isFinalizado());
+		ps.setDate(3,
+				tarefa.getDataFinalizacao() != null ? new Date(tarefa.getDataFinalizacao().getTimeInMillis()) : null);
+		ps.setLong(4, tarefa.getId());
+		ps.execute();
+	}
+
+	public void finaliza(Long id) throws SQLException {
+		if (id == null) {
+			throw new IllegalStateException("id invalido");
+		}
+		PreparedStatement ps = connection
+				.prepareStatement("update tarefa set finalizado = ?, datafinalizacao = ? where id = ?");
+		ps.setBoolean(1, true);
+		ps.setDate(2, new Date(Calendar.getInstance().getTimeInMillis()));
+		ps.setLong(3, id);
+		ps.execute();
 	}
 
 }

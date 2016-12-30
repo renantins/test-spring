@@ -16,7 +16,6 @@
 		<textarea name="descricao" rows="5" cols="100"></textarea>
 		<br>Finalizado<input type="radio" name="finalizando" value="true"> Nao finalizado <input
 			type="radio" name="finalizando" value="true">
-		<!--  Data:<input type="text" name="datafinalizacao">	--> 
 			 <input type="submit" value="Adicionar">
 	</form>
 </body>
