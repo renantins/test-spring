@@ -35,7 +35,7 @@
 			<tr>
 				<td>${tarefa.id}</td>
 				<td>${tarefa.descricao}</td>
-				<c:if test="${tarefa.finalizado eq false">
+				<c:if test="${tarefa.finalizado eq false}">
 					<td id="tarefa_${tarefa.id}"><a href="#"
 						onclick="finalizaAgora(${tarefa.id})">Finaliza agora</a></td>
 				</c:if>

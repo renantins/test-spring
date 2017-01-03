@@ -12,19 +12,26 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import javax.sql.DataSource;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+
 import com.mysql.jdbc.Driver;
 
+@Repository
 public class JdbcTarefaDao {
 
 	private Connection connection;
 
-	public JdbcTarefaDao() throws SQLException {
+	@Autowired
+	public JdbcTarefaDao(DataSource dataSource)  {
+		
 		try {
-			Class.forName("com.mysql.jdbc.Driver");
-		} catch (ClassNotFoundException e) {
+			connection = dataSource.getConnection();
+		} catch (SQLException e) {
 			throw new RuntimeException(e);
 		}
-		connection = DriverManager.getConnection("jdbc:mysql://localhost/tarefas", "root", "root");
 	}
 
 	public void adiciona(Tarefa tarefa) throws SQLException {
