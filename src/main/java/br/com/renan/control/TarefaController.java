@@ -1,97 +1,74 @@
 package br.com.renan.control;
 
-import java.sql.SQLException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import br.com.renan.model.JdbcTarefaDao;
+import br.com.renan.dao.JdbcTarefaDao;
+import br.com.renan.dao.JpaTarefaDao;
+import br.com.renan.dao.TarefaDao;
 import br.com.renan.model.Tarefa;
 
 @Controller
+@Transactional
 public class TarefaController {
 
-	private JdbcTarefaDao dao;
-
 	@Autowired
-	public TarefaController(JdbcTarefaDao dao) {
-		this.dao = dao;
-	}
+	@Qualifier("jpaTarefaDao")
+	TarefaDao dao;
 
 	@RequestMapping("novaTarefa")
 	public String form() {
 		return "tarefa/formulario";
 	}
-
+	
 	@RequestMapping("adicionaTarefa")
 	public String adicionar(@Valid Tarefa tarefa, BindingResult result) {
-		try {
-			dao.adiciona(tarefa);
-		} catch (SQLException e) {
-			throw new RuntimeException(e);
-		}
+		dao.adiciona(tarefa);
 		if (result.hasErrors()) {
 			return "tarefa/formulario";
 		}
-		return "tarefa/adicionada";
+		return "redirect:listaTarefas";
 	}
 
 	@RequestMapping("listaTarefas")
 	public String lista(Model model) {
 		List<Tarefa> tarefas;
-		try {
-			tarefas = dao.lista();
-		} catch (SQLException e) {
-			throw new RuntimeException(e);
-		}
+		tarefas = dao.lista();
 		model.addAttribute("tarefas", tarefas);
 		return "tarefa/lista";
 	}
 
 	@RequestMapping("removeTarefa")
 	public String removeTarefa(Tarefa tarefa) {
-		try {
-			dao.remove(tarefa);
-		} catch (SQLException e) {
-			throw new RuntimeException(e);
-		}
+		dao.remove(tarefa);
 		return "redirect:listaTarefas";
 	}
 
 	@RequestMapping("mostraTarefa")
 	public String mostraTarefa(Long id, Model model) {
-		try {
-			model.addAttribute("tarefa", dao.buscaPorId(id));
-		} catch (SQLException e) {
-			throw new RuntimeException(e);
-		}
+		model.addAttribute("tarefa", dao.buscaPorId(id));
 		return "tarefa/mostra";
 	}
 
 	@RequestMapping("alteraTarefa")
 	public String altera(Tarefa tarefa) {
-		try {
-			dao.altera(tarefa);
-		} catch (SQLException e) {
-			throw new RuntimeException(e);
-		}
+		dao.altera(tarefa);
 		return "redirect:listaTarefas";
 	}
 
 	@RequestMapping("finalizaTarefa")
 	public void finalizaAgora(Long id, HttpServletResponse response) {
-		try {
-			dao.finaliza(id);
-		} catch (SQLException e) {
-			throw new RuntimeException(e);
-		}
+		dao.finaliza(id);
 		response.setStatus(200);
 	}
 
